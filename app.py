@@ -390,21 +390,21 @@ def score_equity(data: dict, asof: pd.Timestamp, weights: dict) -> pd.DataFrame:
 # ============================================================
 PULSAR_CSS = """
 :root {
-  --paper: #ece7d5;
-  --ink: #15140f;
-  --ink-soft: #2a271e;
+  --bg: #0c0c0c;
+  --ink: #ece7d5;
+  --ink-soft: #a8a294;
   --muted: #8a8470;
-  --rule: #15140f;
-  --green: #2f5b2a;
+  --rule: #ece7d5;
+  --green: #7ab574;
   --green-deep: #1f3f1c;
-  --red: #8a2a1c;
+  --red: #d96b5c;
   --red-deep: #5a1a10;
   --orange: #d28a1f;
-  --shade: rgba(180, 165, 120, 0.18);
+  --shade: rgba(180, 165, 120, 0.10);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
@@ -435,6 +435,7 @@ body { padding: 28px 40px 36px; }
 h1 {
   font-family: 'PT Serif', serif; font-style: italic; font-weight: 700;
   font-size: 64px; line-height: 0.98; letter-spacing: -0.02em;
+  color: var(--ink);
 }
 .blurb {
   font-size: 11.5px; letter-spacing: 0.04em; line-height: 1.55;
@@ -454,7 +455,7 @@ h1 {
   font-weight: 400; letter-spacing: 0.06em; margin-top: 4px;
 }
 .group-head { color: var(--orange); }
-.table tbody tr { border-top: 1px solid rgba(21, 20, 15, 0.18); }
+.table tbody tr { border-top: 1px solid rgba(236, 231, 213, 0.15); }
 .table tbody tr:last-child { border-bottom: 1px solid var(--rule); }
 .table tbody td {
   padding: 14px 6px; font-size: 12.5px; text-align: right;
@@ -477,11 +478,11 @@ h1 {
 .pip {
   display: inline-flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; border-radius: 50%;
-  font-size: 12px; font-weight: 700; color: var(--paper);
+  font-size: 12px; font-weight: 700; color: var(--ink);
 }
 .pip.plain { background: none; color: var(--ink); font-weight: 500; }
 .pip.green { background: var(--green-deep); }
-.pip.orange { background: var(--orange); }
+.pip.orange { background: var(--orange); color: #0c0c0c; }
 .pip.red { background: var(--red-deep); }
 .pos { color: var(--green); }
 .neg { color: var(--red); }
@@ -502,8 +503,11 @@ h1 {
 def fmt_num(v, dp=2, pct=False):
     if v is None or (isinstance(v, float) and np.isnan(v)):
         return ("neutral", "n/a")
-    sign = "+" if v >= 0 else ""
-    s = f"{sign}{v:.{dp}f}{'%' if pct else ''}"
+    if v >= 0:
+        s = f"+{v:.{dp}f}{'%' if pct else ''}"
+    else:
+        # proper minus sign (U+2212), not hyphen
+        s = f"−{abs(v):.{dp}f}{'%' if pct else ''}"
     cls = "pos" if v > 0 else ("neg" if v < 0 else "neutral")
     return (cls, s)
 
@@ -665,11 +669,20 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-.stApp { background: #ece7d5; }
-section[data-testid="stSidebar"] { background: #e3deca; }
-section[data-testid="stSidebar"] * { color: #15140f !important; }
-h1, h2, h3, .stMarkdown { color: #15140f; }
+.stApp { background: #0c0c0c; }
+section[data-testid="stSidebar"] { background: #161513; }
+section[data-testid="stSidebar"] * { color: #ece7d5 !important; }
+h1, h2, h3, .stMarkdown, .stMarkdown p, .stMarkdown li, [data-testid="stHeader"] { color: #ece7d5; }
 .block-container { padding-top: 1.5rem; padding-bottom: 1rem; max-width: 100%; }
+/* slider track in eggshell */
+[data-baseweb="slider"] [role="slider"] { background-color: #d28a1f !important; }
+/* radio + checkbox text */
+.stRadio label, .stCheckbox label { color: #ece7d5 !important; }
+/* download buttons */
+.stDownloadButton button {
+  background: #161513; color: #ece7d5; border: 1px solid #ece7d5;
+}
+.stDownloadButton button:hover { background: #1f1d1a; color: #d28a1f; border-color: #d28a1f; }
 </style>
 """, unsafe_allow_html=True)
 
