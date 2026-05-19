@@ -737,11 +737,13 @@ asof_str = asof.strftime("%B %Y · As-of %Y-%m-%d")
 if dash == "Rates":
     scores = score_rates(data, asof, weights)
     html = render_rates(scores, asof_str, weights)
+    iframe_height = 900   # 10 rows + header + title + footer
 else:
     scores = score_equity(data, asof, weights)
     html = render_equity(scores, asof_str, weights)
+    iframe_height = 1200  # 17 rows + header + title + footer
 
-components.html(html, height=950, scrolling=True)
+components.html(html, height=iframe_height, scrolling=False)
 
 if show_raw:
     st.markdown("#### Raw factor table")
